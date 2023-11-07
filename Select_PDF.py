@@ -3,6 +3,7 @@ import chromadb
 from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from PyPDF2 import PdfReader
+import re
 
 ## Intitialization
 # Intialize ChromaDB
@@ -34,6 +35,11 @@ def sanitize_string(input_str):
 
     return sanitized
 
+st.set_page_config(
+    page_title="SummarizEd.ai",
+    page_icon="📚",
+    layout="centered",
+)
 
 # Session states
 db_client = st.session_state.db_client = init_db()
@@ -43,14 +49,15 @@ embeddings = st.session_state.embeddings = init_embedding()
 collections = st.session_state.db_client.list_collections()
 
 ## App Title
-st.title("Summariz:orange[Ed] :gray[- PDF Summarizer]")
+# st.title("Summariz:orange[Ed] :gray[- PDF Summarizer]")
+st.title("Summariz:orange[Ed]:grey[.ai]")
 st.subheader("", divider="gray")    # maybe not be a proper way but i like this
 
 
 pdf_list = tuple(collection.name for collection in collections)
 placeholder = "Select the PDF file to search..." if len(pdf_list) > 0 else "No PDFs uploaded"
 file_name = st.selectbox(
-   "Already processed PDFs:",
+   "Select PDF file:",
    pdf_list,
    index=None,
    placeholder = placeholder,
@@ -72,6 +79,8 @@ if uploaded_file is not None:
     for page_num in range(len(pdf_reader.pages)):
         page = pdf_reader.pages[page_num]
         pdf_text += page.extract_text()
+
+    print(pdf_text)
 
     if st.button("Process PDF", type="primary"):
         if file_name in {collection.name for collection in collections}:

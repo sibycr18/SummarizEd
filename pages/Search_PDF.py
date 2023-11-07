@@ -23,16 +23,23 @@ def get_llm_response(query, collection):
     answer = chain.run(input_documents=matching_docs, question=query)
     return answer
 
-
+st.set_page_config(
+    page_title="SummarizEd.ai",
+    page_icon="📚",
+    layout="wide",
+)
 ## App Title
-st.title("Summariz:orange[Ed] :gray[- PDF Summarizer]")
+st.title("Summariz:orange[Ed]:grey[.ai]")
 st.subheader("", divider="gray")
 
 # Columns for inputs
 col1, col2 = st.columns([4, 1])
 
 # Save topic entered in session state
-topic = st.session_state.topic
+if 'topic' in st.session_state:
+    topic = st.session_state.topic
+else:
+    topic = "eg. 8086 architecture"
 topic = col1.text_input("Enter the topic to summarize:", value = topic)
 st.session_state.topic = topic
 
@@ -52,7 +59,7 @@ if word_length == "No limit":
     """
 else:
     no_of_words = {
-        "Short": 50,
+        "Very Short": 50,
         "Brief": 120,
         "Medium": 200,
         "Long": 400
