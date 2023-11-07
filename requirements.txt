@@ -2,5 +2,5 @@ streamlit
 PyPDF2
 chromadb
 langchain
-# pysqlite3-binary
+pysqlite3-binary
 sentence-transformers
