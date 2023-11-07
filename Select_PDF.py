@@ -3,9 +3,9 @@ from langchain.embeddings import HuggingFaceEmbeddings
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from PyPDF2 import PdfReader
 import re
-__import__('pysqlite3')
-import sys
-sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
+# __import__('pysqlite3')
+# import sys
+# sys.modules['sqlite3'] = sys.modules.pop('pysqlite3')
 import chromadb
 
 ## Intitialization
@@ -90,30 +90,30 @@ if uploaded_file is not None:
                 st.warning(
                     f"PDF '{file_name}' has already been processed. Select it from the above list.")
         else:
-            ## Db insertion
-            collection = db_client.create_collection(name=file_name)
+            with st.spinner("Processing PDF..."):
+                ## Db insertion
+                collection = db_client.create_collection(name=file_name)
 
-            # Split text into chunks
-            text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
-            chunks = text_splitter.split_text(pdf_text)
+                # Split text into chunks
+                text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=100)
+                chunks = text_splitter.split_text(pdf_text)
 
-            # Convert chunks to vector representations and store in ChromaDB
-            documents_list = []
-            embeddings_list = []
-            ids_list = []
+                # Convert chunks to vector representations and store in ChromaDB
+                documents_list = []
+                embeddings_list = []
+                ids_list = []
 
-            for idx, chunk in enumerate(chunks):
-                vector = embeddings.embed_query(chunk)
-                documents_list.append(chunk)
-                embeddings_list.append(vector)
-                ids_list.append(f"{file_name}_{idx}")
+                for idx, chunk in enumerate(chunks):
+                    vector = embeddings.embed_query(chunk)
+                    documents_list.append(chunk)
+                    embeddings_list.append(vector)
+                    ids_list.append(f"{file_name}_{idx}")
 
-            collection.add(
-                embeddings=embeddings_list,
-                documents=documents_list,
-                ids=ids_list
-            )
-
+                collection.add(
+                    embeddings=embeddings_list,
+                    documents=documents_list,
+                    ids=ids_list
+                )
             st.success("PDF has been processed successfully")
 
 
