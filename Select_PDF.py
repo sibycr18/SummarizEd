@@ -17,6 +17,23 @@ def init_embedding():
     embeddings = HuggingFaceEmbeddings(model_name="infgrad/stella-base-en-v2")
     return embeddings
 
+def sanitize_string(input_str):
+    # Remove non-alphanumeric, underscores, hyphens, and periods
+    sanitized = re.sub(r"[^A-Za-z0-9_.-]", "", input_str)
+
+    # Replace consecutive periods with a single period
+    sanitized = re.sub(r"\.{2,}", ".", sanitized)
+
+    # Ensure the string starts and ends with an alphanumeric character
+    sanitized = re.sub(r"^[^A-Za-z0-9]+", "", sanitized)
+    sanitized = re.sub(r"[^A-Za-z0-9]+$", "", sanitized)
+
+    # Truncate or pad string to meet the 3-63 character length requirement
+    sanitized = sanitized[:63] if len(
+        sanitized) > 63 else sanitized.ljust(3, "_")
+
+    return sanitized
+
 
 # Session states
 db_client = st.session_state.db_client = init_db()
@@ -48,7 +65,7 @@ st.subheader("OR")
 uploaded_file = st.file_uploader("Upload a new PDF file", type=["pdf"])
 
 if uploaded_file is not None:
-    file_name = uploaded_file.name
+    file_name = sanitize_string(uploaded_file.name)
     # Read and display the content of the PDF file
     pdf_reader = PdfReader(uploaded_file)
     pdf_text = ""

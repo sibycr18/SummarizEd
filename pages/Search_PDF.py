@@ -28,34 +28,56 @@ def get_llm_response(query, collection):
 st.title("Summariz:orange[Ed] :gray[- PDF Summarizer]")
 st.subheader("", divider="gray")
 
+# Columns for inputs
 col1, col2 = st.columns([4, 1])
 
-topic = col1.text_input("Enter the topic to summarize:")
+# Save topic entered in session state
+topic = st.session_state.topic
+topic = col1.text_input("Enter the topic to summarize:", value = topic)
+st.session_state.topic = topic
 
-st.write('<style>div.Widget.row-widget.stRadio > div{flex-direction:row;}</style>', unsafe_allow_html=True)
+# Radio buttons for word limit
 word_length = col2.radio(
-    "Summary length:",
-    ["Short", "Brief", "Medium", "Long"],
-    index = 2,
-    label_visibility = "hidden",
+    "Word limit:",
+    ["No limit", "Short", "Brief", "Medium", "Long"],
+    index = 0
 )
 
-no_of_words = {
-    "Short": 50,
-    "Brief": 120,
-    "Medium": 200,
-    "Long": 400
-}
+# Query Formatting
+if word_length == "No limit":
+    query = f"""
+    Summarize the following topic: "{topic}".
+    Use heading, bullet points, highlights etc. wherever necessary.
+    The result should not miss the main points of the topic but also not include unecessary sentences.
+    """
+else:
+    no_of_words = {
+        "Short": 50,
+        "Brief": 120,
+        "Medium": 200,
+        "Long": 400
+    }
+    query = f"""
+    Summarize the following topic in around {no_of_words[word_length]} words: "{topic}".
+    Use heading, bullet points, highlights etc. wherever necessary.
+    The result should not miss the main points of the topic but also not include unecessary sentences.
+    """
 
-query = f"""
-Summarize the following topic in around {no_of_words[word_length]} words: "{topic}".
-Use heading, bullet points, highlights etc. wherever necessary.
-The result should not miss the main points of the topic.
-"""
-
+# Create search button
 search_button = col1.button("Search", type="primary")
+
+# Check if search button is clicked
 if search_button:
-    collection = st.session_state.file_name
-    st.subheader("", divider="gray")
-    # st.subheader("Answer:")
-    st.write(get_llm_response(query, collection))
+    # Show loading spinner while summarizing
+    with st.spinner("Summarising the topic. Please wait..."):
+        # Get the selected PDF collection
+        collection = st.session_state.file_name
+        # Check if a PDF file is selected
+        if collection == None:
+            st.warning("Please select or upload a PDF file first.")
+        else:
+            # Get the response text from LLM model
+            response_text = get_llm_response(query, collection)
+            st.subheader("Answer", divider="gray")
+            # Display the response text
+            st.write(str(response_text))
