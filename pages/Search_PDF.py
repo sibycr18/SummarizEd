@@ -46,7 +46,7 @@ st.session_state.topic = topic
 # Radio buttons for word limit
 word_length = col2.radio(
     "Word limit:",
-    ["No limit", "Short", "Brief", "Medium", "Long"],
+    ["No limit", "Very Short", "Brief", "Medium", "Long"],
     index = 0
 )
 
