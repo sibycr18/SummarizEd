@@ -1,1 +1,1 @@
-# summarizeEd.ai
+# SummarizeEd.ai
