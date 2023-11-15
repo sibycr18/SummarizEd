@@ -4,3 +4,4 @@ chromadb
 langchain
 pysqlite3-binary
 sentence-transformers
+PyCryptodome
